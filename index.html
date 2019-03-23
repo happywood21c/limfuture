@@ -1,8 +1,35 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html>
   <head>
-    <meta charset="utf-8">
-    <title></title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load("current", {packages:["calendar"]});
+      google.charts.setOnLoadCallback(drawChart);
+
+   function drawChart() {
+       var dataTable = new google.visualization.DataTable();
+       dataTable.addColumn({ type: 'date', id: 'Date' });
+       dataTable.addColumn({ type: 'number', id: 'Won/Loss' });
+       dataTable.addRows([
+          [ new Date(2019, 0, 1), 2 ],
+          [ new Date(2019, 2, 18), 1 ],
+          [ new Date(2019, 2, 19), 1 ],
+          [ new Date(2019, 2, 20), 1 ],
+          [ new Date(2019, 2, 21), -1 ],
+          [ new Date(2019, 2, 22), 1 ],
+          [ new Date(2019, 2, 23), 1 ],
+          [ new Date(2019, 10, 14),2 ]
+        ]);
+
+       var chart = new google.visualization.Calendar(document.getElementById('calendar_basic'));
+
+       var options = {
+         title: "Study Status",
+         height: 350,
+       };
+
+       chart.draw(dataTable, options);
+   }
+    </script>
   </head>
   <body>
     <font size="150">
@@ -22,5 +49,6 @@
   document.write("<p>수능까지<b>" +" "+ daysLeft + " 일 " +
     hrsLeft +" 시간 " + minsLeft + " 분 남았음  </p>");
   </script>
+    <div id="calendar_basic" style="width: 1000px; height: 550px;"></div>
   </body>
 </html>
