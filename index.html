@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" >
+<html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
     <title>Home page</title>
@@ -10,32 +10,46 @@
       .topmenu {
         background-color: #444;
         width:1080px;
-        height:56px;
-        position; fixed;
-      }
-      .mainleft {
-        background-color: gray;
-        width:540px;
-        height:2344px;
-        position; fixed;
-      }
-      .mainright {
-        background-color: green;
-        width:540px;
-        height:2344px;
+        height:2400px;
         position: fixed;
-        left: 540px;
       }
-
+      .main {
+        background-color: ivory;
+        border-radius: 25px;
+        width:500px;
+        height:1500px;
+        position: fixed;
+        padding: 50px;
+        margin: 100px;
+      }
+      .title {
+        background-color: red;
+        border-radius: 10px;
+        width:100px;
+        height:100px;
+        position: fixed;
+        padding: 50px;
+        margin: 100px;
+        animation-name: example;
+        animation-duration: 4s;
+      }
+      @keyframes example {
+       0%   {background-color: red;}
+       25%  {background-color: yellow;}
+       50%  {background-color: blue;}
+       100% {background-color: green;}
+       }
+      }
 
     </style>
   </head>
   <body>
     <div class="topmenu">
-    </div>
-    <div class="mainright">
-    </div>
-    <div class="mainleft">
+         <div class="main">
+              <div class="title"> 기술이전 1
+
+              </div>
+         </div>
 
     </div>
 
