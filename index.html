@@ -1,13 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<title>Page Title</title>
+  <meta charset="UTF-8">
+  <title>高崎市の天気</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .weather-card { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+  </style>
 </head>
 <body>
+  <h1>高崎市の天気</h1>
+  <div id="current-weather" class="weather-card"></div>
+  <div id="forecast" class="weather-card"></div>
 
-<h1>Monthly spend</h1>
-<p>day 1 : 2222 </p>
+  <script>
+    const apiKey = '여기에_당신의_API_키를_넣으세요'; // OpenWeatherMap API 키
+    const city = 'Takasaki';
+    const apiUrlCurrent = `https://api.openweathermap.org/data/2.5/weather?q=${city},JP&appid=${apiKey}&units=metric&lang=ja`;
+    const apiUrlForecast = `https://api.openweathermap.org/data/2.5/forecast?q=${city},JP&appid=${apiKey}&units=metric&lang=ja`;
 
+    // 현재 날씨 가져오기
+    fetch(apiUrlCurrent)
+      .then(response => response.json())
+      .then(data => {
+        const weatherDiv = document.getElementById('current-weather');
+        weatherDiv.innerHTML = `
+          <h2>現在の天気</h2>
+          <p>天気: ${data.weather[0].description}</p>
+          <p>気温: ${data.main.temp} °C</p>
+          <p>湿度: ${data.main.humidity}%</p>
+        `;
+      });
+
+    // 3일 예보 가져오기
+    fetch(apiUrlForecast)
+      .then(response => response.json())
+      .then(data => {
+        const forecastDiv = document.getElementById('forecast');
+        forecastDiv.innerHTML = `<h2>3日間の予報</h2>`;
+
+        // 3일 동안 매일 정오(12:00) 데이터만 표시
+        const dailyForecasts = data.list.filter(forecast => forecast.dt_txt.includes('12:00:00')).slice(0, 3);
+
+        dailyForecasts.forEach(forecast => {
+          const date = new Date(forecast.dt_txt);
+          forecastDiv.innerHTML += `
+            <div>
+              <strong>${date.getMonth()+1}/${date.getDate()}:</strong>
+              ${forecast.weather[0].description}, 気温: ${forecast.main.temp} °C
+            </div>
+          `;
+        });
+      });
+  </script>
 </body>
 </html>
-
