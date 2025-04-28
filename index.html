@@ -2,19 +2,62 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>高崎市の天気</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .weather-card { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f0f4f8;
+      color: #333;
+    }
+    h1 {
+      font-size: 1.8em;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .weather-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      padding: 20px;
+      text-align: center;
+    }
+    .weather-card h2 {
+      font-size: 1.4em;
+      margin-bottom: 10px;
+    }
+    .weather-info {
+      font-size: 1.1em;
+      margin: 8px 0;
+    }
+    .weather-icon {
+      width: 80px;
+      height: 80px;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      h1 {
+        font-size: 1.5em;
+      }
+      .weather-card {
+        padding: 15px;
+      }
+    }
   </style>
 </head>
 <body>
   <h1>高崎市の天気</h1>
+  
   <div id="current-weather" class="weather-card"></div>
   <div id="forecast" class="weather-card"></div>
 
   <script>
-    const apiKey = '8edc1ba1c8dbb24f7e2a20503350c9e7'; // OpenWeatherMap API 키
+    const apiKey = '여기에_당신의_API_키를_넣으세요'; // OpenWeatherMap API 키
     const city = 'Takasaki';
     const apiUrlCurrent = `https://api.openweathermap.org/data/2.5/weather?q=${city},JP&appid=${apiKey}&units=metric&lang=ja`;
     const apiUrlForecast = `https://api.openweathermap.org/data/2.5/forecast?q=${city},JP&appid=${apiKey}&units=metric&lang=ja`;
@@ -24,11 +67,13 @@
       .then(response => response.json())
       .then(data => {
         const weatherDiv = document.getElementById('current-weather');
+        const iconUrl = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+
         weatherDiv.innerHTML = `
           <h2>現在の天気</h2>
-          <p>天気: ${data.weather[0].description}</p>
-          <p>気温: ${data.main.temp} °C</p>
-          <p>湿度: ${data.main.humidity}%</p>
+          <img src="${iconUrl}" alt="天気アイコン" class="weather-icon">
+          <div class="weather-info">気温: ${data.main.temp} °C</div>
+          <div class="weather-info">湿度: ${data.main.humidity}%</div>
         `;
       });
 
@@ -39,17 +84,24 @@
         const forecastDiv = document.getElementById('forecast');
         forecastDiv.innerHTML = `<h2>3日間の予報</h2>`;
 
-        // 3일 동안 매일 정오(12:00) 데이터만 표시
         const dailyForecasts = data.list.filter(forecast => forecast.dt_txt.includes('12:00:00')).slice(0, 3);
 
         dailyForecasts.forEach(forecast => {
           const date = new Date(forecast.dt_txt);
+          const iconUrl = `https://openweathermap.org/img/wn/${forecast.weather[0].icon}@2x.png`;
+
           forecastDiv.innerHTML += `
-            <div>
-              <strong>${date.getMonth()+1}/${date.getDate()}:</strong>
-              ${forecast.weather[0].description}, 気温: ${forecast.main.temp} °C
+            <div class="weather-info">
+              <strong>${date.getMonth()+1}/${date.getDate()}</strong><br>
+              <img src="${iconUrl}" alt="天気アイコン" class="weather-icon"><br>
+              ${forecast.main.temp} °C
             </div>
           `;
+        });
+      });
+  </script>
+</body>
+</html>
         });
       });
   </script>
