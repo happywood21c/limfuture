@@ -1,72 +1,23 @@
-// LiveWeatherScreen.tsx
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Card, CardContent } from "@/components/ui/card";
-import { CloudSun, CloudRain, Snowflake, Cloud } from "lucide-react";
-
-const cityList = [
-  { name: "다카하시", id: 1850734 },
-  { name: "모카", id: 1856595 },
-  { name: "나메가타", id: 1855612 },
-];
-
-const apiKey = "YOUR_API_KEY"; // OpenWeatherMap API 키 입력
-
-export default function LiveWeatherScreen() {
-  const [weatherData, setWeatherData] = useState([]);
-
-  useEffect(() => {
-    async function fetchWeather() {
-      try {
-        const responses = await Promise.all(
-          cityList.map((city) =>
-            axios.get(
-              `https://api.openweathermap.org/data/2.5/weather?id=${city.id}&appid=${apiKey}&units=metric&lang=kr`
-            )
-          )
-        );
-        setWeatherData(responses.map((res) => res.data));
-      } catch (error) {
-        console.error("날씨 데이터 로딩 실패:", error);
-      }
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>일본 날씨</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(to bottom, #dbeafe, #ffffff);
     }
-    fetchWeather();
-  }, []);
-
-  const getIcon = (main: string) => {
-    switch (main) {
-      case "Rain":
-        return <CloudRain className="w-8 h-8 text-blue-500" />;
-      case "Snow":
-        return <Snowflake className="w-8 h-8 text-cyan-500" />;
-      case "Clear":
-        return <CloudSun className="w-8 h-8 text-yellow-500" />;
-      default:
-        return <Cloud className="w-8 h-8 text-gray-400" />;
+    h1 {
+      text-align: center;
     }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white p-4">
-      <h1 className="text-xl font-bold text-center mb-4">일본 실시간 날씨</h1>
-      <div className="flex flex-col gap-4">
-        {weatherData.map((data) => (
-          <Card key={data.id} className="rounded-2xl shadow-md">
-            <CardContent className="flex items-center justify-between p-4">
-              <div>
-                <p className="text-lg font-semibold">{data.name}</p>
-                <p className="text-sm text-gray-600">{data.weather[0].description}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                {getIcon(data.weather[0].main)}
-                <span className="text-xl font-bold">
-                  {Math.round(data.main.temp)}°C
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(
