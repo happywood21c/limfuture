@@ -20,4 +20,65 @@
       border-radius: 16px;
       padding: 16px;
       margin-bottom: 16px;
-      box-shadow: 0 4px 12px rgba(
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .weather-info {
+      font-size: 14px;
+      color: #555;
+    }
+    .temp {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .icon {
+      width: 40px;
+      height: 40px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <h1>일본 실시간 날씨</h1>
+  <div id="weather-container"></div>
+
+  <script>
+    const apiKey = 'YOUR_API_KEY'; // OpenWeatherMap API 키 입력
+    const cities = [
+      { name: '다카하시', id: 1850734 },
+      { name: '모카', id: 1856595 },
+      { name: '나메가타', id: 1855612 }
+    ];
+
+    async function fetchWeather() {
+      const container = document.getElementById('weather-container');
+      for (const city of cities) {
+        try {
+          const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?id=${city.id}&appid=${apiKey}&units=metric&lang=kr`);
+          const data = await res.json();
+
+          const weatherEl = document.createElement('div');
+          weatherEl.className = 'card';
+          weatherEl.innerHTML = `
+            <div>
+              <div><strong>${city.name}</strong></div>
+              <div class="weather-info">${data.weather[0].description}</div>
+            </div>
+            <div>
+              <img class="icon" src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="icon"/>
+              <div class="temp">${Math.round(data.main.temp)}°C</div>
+            </div>
+          `;
+          container.appendChild(weatherEl);
+        } catch (error) {
+          console.error(`${city.name} 날씨 불러오기 실패:`, error);
+        }
+      }
+    }
+
+    fetchWeather();
+  </script>
+</body>
+</html>
