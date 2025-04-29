@@ -1,10 +1,9 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>일본 날씨</title>
+  <title>일본 날씨 3일간 예보</title>
   <style>
     body {
       font-family: sans-serif;
@@ -14,71 +13,111 @@
     }
     h1 {
       text-align: center;
+      margin-bottom: 24px;
     }
-    .card {
+    .city-card {
       background: white;
       border-radius: 16px;
       padding: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .city-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .forecast-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .weather-info {
-      font-size: 14px;
-      color: #555;
-    }
-    .temp {
-      font-size: 20px;
-      font-weight: bold;
+    .forecast-item {
+      text-align: center;
+      flex: 1;
     }
     .icon {
-      width: 40px;
-      height: 40px;
-      vertical-align: middle;
+      width: 48px;
+      height: 48px;
+    }
+    .date {
+      font-size: 12px;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <h1>일본 실시간 날씨</h1>
+  <h1>일본 날씨 (3일 예보)</h1>
   <div id="weather-container"></div>
 
   <script>
-    const apiKey = '8edc1ba1c8dbb24f7e2a20503350c9e7'; // OpenWeatherMap API 키 입력
+    const apiKey = 'YOUR_API_KEY'; // ← OpenWeatherMap API 키 입력
     const cities = [
-      { name: '다카하시', id:1850734 },
-      { name: '모카', id:1856595 },
-      { name: '나메가타', id:1856595 }
+      { name: '다카하시', id: 1850734 },
+      { name: '모카', id: 1856595 },
+      { name: '나메가타', id: 1855612 }
     ];
 
-    async function fetchWeather() {
+    async function fetchForecast(city) {
+      const url = `https://api.openweathermap.org/data/2.5/forecast?id=${city.id}&appid=${apiKey}&units=metric&lang=kr`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`${city.name} 요청 실패`);
+      const data = await res.json();
+      return processForecastData(data);
+    }
+
+    function processForecastData(data) {
+      const dailyForecast = {};
+      data.list.forEach(item => {
+        const date = item.dt_txt.split(' ')[0];
+        if (!dailyForecast[date]) {
+          dailyForecast[date] = item;
+        }
+      });
+
+      const sortedDates = Object.keys(dailyForecast).slice(0, 3); // 오늘 + 다음 2일
+      return sortedDates.map(date => {
+        const info = dailyForecast[date];
+        return {
+          date,
+          icon: info.weather[0].icon,
+          desc: info.weather[0].description
+        };
+      });
+    }
+
+    async function renderForecast() {
       const container = document.getElementById('weather-container');
       for (const city of cities) {
         try {
-          const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?id=${city.id}&appid=${apiKey}&units=metric&lang=kr`);
-          const data = await res.json();
+          const forecasts = await fetchForecast(city);
+          const cityCard = document.createElement('div');
+          cityCard.className = 'city-card';
+          cityCard.innerHTML = `<div class="city-name">${city.name}</div>`;
 
-          const weatherEl = document.createElement('div');
-          weatherEl.className = 'card';
-          weatherEl.innerHTML = `
-            <div>
-              <div><strong>${city.name}</strong></div>
-              <div class="weather-info">${data.weather[0].description}</div>
-            </div>
-            <div>
-              <img class="icon" src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="icon"/>
-              <div class="temp">${Math.round(data.main.temp)}°C</div>
-            </div>
-          `;
-          container.appendChild(weatherEl);
-        } catch (error) {
-          console.error(`${city.name} 날씨 불러오기 실패:`, error);
+          const row = document.createElement('div');
+          row.className = 'forecast-row';
+
+          forecasts.forEach(f => {
+            const item = document.createElement('div');
+            item.className = 'forecast-item';
+            item.innerHTML = `
+              <div class="date">${f.date}</div>
+              <img class="icon" src="https://openweathermap.org/img/wn/${f.icon}@2x.png" alt="icon" />
+              <div class="desc">${f.desc}</div>
+            `;
+            row.appendChild(item);
+          });
+
+          cityCard.appendChild(row);
+          container.appendChild(cityCard);
+        } catch (err) {
+          console.error(err.message);
         }
       }
     }
 
-    fetchWeather();
+    renderForecast();
   </script>
 </body>
 </html>
