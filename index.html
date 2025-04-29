@@ -1,104 +1,72 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>高崎市の天気</title>
-  <style>
-    body {
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: #f0f4f8;
-      color: #333;
-    }
-    h1 {
-      font-size: 1.8em;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .weather-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-      padding: 20px;
-      text-align: center;
-    }
-    .weather-card h2 {
-      font-size: 1.4em;
-      margin-bottom: 10px;
-    }
-    .weather-info {
-      font-size: 1.1em;
-      margin: 8px 0;
-    }
-    .weather-icon {
-      width: 80px;
-      height: 80px;
-    }
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
-      h1 {
-        font-size: 1.5em;
-      }
-      .weather-card {
-        padding: 15px;
+// LiveWeatherScreen.tsx
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Card, CardContent } from "@/components/ui/card";
+import { CloudSun, CloudRain, Snowflake, Cloud } from "lucide-react";
+
+const cityList = [
+  { name: "다카하시", id: 1850734 },
+  { name: "모카", id: 1856595 },
+  { name: "나메가타", id: 1855612 },
+];
+
+const apiKey = "YOUR_API_KEY"; // OpenWeatherMap API 키 입력
+
+export default function LiveWeatherScreen() {
+  const [weatherData, setWeatherData] = useState([]);
+
+  useEffect(() => {
+    async function fetchWeather() {
+      try {
+        const responses = await Promise.all(
+          cityList.map((city) =>
+            axios.get(
+              `https://api.openweathermap.org/data/2.5/weather?id=${city.id}&appid=${apiKey}&units=metric&lang=kr`
+            )
+          )
+        );
+        setWeatherData(responses.map((res) => res.data));
+      } catch (error) {
+        console.error("날씨 데이터 로딩 실패:", error);
       }
     }
-  </style>
-</head>
-<body>
-  <h1>高崎市の天気</h1>
-  
-  <div id="current-weather" class="weather-card"></div>
-  <div id="forecast" class="weather-card"></div>
+    fetchWeather();
+  }, []);
 
-  <script>
-    const apiKey = '8edc1ba1c8dbb24f7e2a20503350c9e7'; // OpenWeatherMap API 키
-    const city = 'Takasaki';
-    const apiUrlCurrent = `https://api.openweathermap.org/data/2.5/weather?q=${city},JP&appid=${apiKey}&units=metric&lang=ja`;
-    const apiUrlForecast = `https://api.openweathermap.org/data/2.5/forecast?q=${city},JP&appid=${apiKey}&units=metric&lang=ja`;
+  const getIcon = (main: string) => {
+    switch (main) {
+      case "Rain":
+        return <CloudRain className="w-8 h-8 text-blue-500" />;
+      case "Snow":
+        return <Snowflake className="w-8 h-8 text-cyan-500" />;
+      case "Clear":
+        return <CloudSun className="w-8 h-8 text-yellow-500" />;
+      default:
+        return <Cloud className="w-8 h-8 text-gray-400" />;
+    }
+  };
 
-    // 현재 날씨 가져오기
-    fetch(apiUrlCurrent)
-      .then(response => response.json())
-      .then(data => {
-        const weatherDiv = document.getElementById('current-weather');
-        const iconUrl = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
-
-        weatherDiv.innerHTML = `
-          <h2>現在の天気</h2>
-          <img src="${iconUrl}" alt="天気アイコン" class="weather-icon">
-          <div class="weather-info">気温: ${data.main.temp} °C</div>
-          <div class="weather-info">湿度: ${data.main.humidity}%</div>
-        `;
-      });
-
-    // 3일 예보 가져오기
-    fetch(apiUrlForecast)
-      .then(response => response.json())
-      .then(data => {
-        const forecastDiv = document.getElementById('forecast');
-        forecastDiv.innerHTML = `<h2>3日間の予報</h2>`;
-
-        const dailyForecasts = data.list.filter(forecast => forecast.dt_txt.includes('12:00:00')).slice(0, 3);
-
-        dailyForecasts.forEach(forecast => {
-          const date = new Date(forecast.dt_txt);
-          const iconUrl = `https://openweathermap.org/img/wn/${forecast.weather[0].icon}@2x.png`;
-
-          forecastDiv.innerHTML += `
-            <div class="weather-info">
-              <strong>${date.getMonth()+1}/${date.getDate()}</strong><br>
-              <img src="${iconUrl}" alt="天気アイコン" class="weather-icon"><br>
-              ${forecast.main.temp} °C
-            </div>
-          `;
-        });
-      });
-  </script>
-</body>
-</html>
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white p-4">
+      <h1 className="text-xl font-bold text-center mb-4">일본 실시간 날씨</h1>
+      <div className="flex flex-col gap-4">
+        {weatherData.map((data) => (
+          <Card key={data.id} className="rounded-2xl shadow-md">
+            <CardContent className="flex items-center justify-between p-4">
+              <div>
+                <p className="text-lg font-semibold">{data.name}</p>
+                <p className="text-sm text-gray-600">{data.weather[0].description}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {getIcon(data.weather[0].main)}
+                <span className="text-xl font-bold">
+                  {Math.round(data.main.temp)}°C
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
