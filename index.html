@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>일본 날씨 3일간 예보</title>
+  <title>일본 날씨 3일 예보</title>
   <style>
     body {
       font-family: sans-serif;
@@ -44,6 +44,10 @@
       font-size: 12px;
       color: #555;
     }
+    .temp-range {
+      font-size: 13px;
+      color: #333;
+    }
   </style>
 </head>
 <body>
@@ -51,10 +55,10 @@
   <div id="weather-container"></div>
 
   <script>
-    const apiKey = '8edc1ba1c8dbb24f7e2a20503350c9e7'; // ← OpenWeatherMap API 키 입력
+    const apiKey = 'YOUR_API_KEY'; // ← OpenWeatherMap API 키 입력
     const cities = [
-      { name: '다카하시', id: 1854383 },
-      { name: '모카', id: 1849053 },
+      { name: '오카야마 (다카하시 인근)', id: 1854383 },
+      { name: '우츠노미야 (모카 인근)', id: 1849053 },
       { name: '나메가타', id: 1855612 }
     ];
 
@@ -67,21 +71,31 @@
     }
 
     function processForecastData(data) {
-      const dailyForecast = {};
+      const daily = {};
       data.list.forEach(item => {
         const date = item.dt_txt.split(' ')[0];
-        if (!dailyForecast[date]) {
-          dailyForecast[date] = item;
-        }
+        if (!daily[date]) daily[date] = [];
+
+        daily[date].push(item);
       });
 
-      const sortedDates = Object.keys(dailyForecast).slice(0, 3); // 오늘 + 다음 2일
+      const sortedDates = Object.keys(daily).slice(0, 3);
+
       return sortedDates.map(date => {
-        const info = dailyForecast[date];
+        const items = daily[date];
+        const temps = items.map(i => i.main.temp);
+        const minTemp = Math.min(...temps);
+        const maxTemp = Math.max(...temps);
+
+        const icon = items[4]?.weather[0].icon || items[0].weather[0].icon;
+        const desc = items[4]?.weather[0].description || items[0].weather[0].description;
+
         return {
           date,
-          icon: info.weather[0].icon,
-          desc: info.weather[0].description
+          icon,
+          desc,
+          min: Math.round(minTemp),
+          max: Math.round(maxTemp)
         };
       });
     }
@@ -105,6 +119,7 @@
               <div class="date">${f.date}</div>
               <img class="icon" src="https://openweathermap.org/img/wn/${f.icon}@2x.png" alt="icon" />
               <div class="desc">${f.desc}</div>
+              <div class="temp-range">${f.min}° ~ ${f.max}°C</div>
             `;
             row.appendChild(item);
           });
