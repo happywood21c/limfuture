@@ -17,7 +17,7 @@
           <th class="p-1">Day 2</th>
           <th class="p-1">Day 3</th>
           <th class="p-1">Day 4</th>
-          <th class="p-1">합계</th>
+          <th class="p-1">평균</th>
         </tr>
       </thead>
       <tbody id="scoreTable">
@@ -45,28 +45,33 @@
         input.type = 'number';
         input.min = 0;
         input.className = `score-input p-1 text-center w-full border rounded-md day${day} player${idx}`;
-        input.oninput = () => calculateTotal(idx);
+        input.oninput = () => calculateAverage(idx);
         cell.appendChild(input);
         row.appendChild(cell);
       }
 
-      const totalCell = document.createElement('td');
-      totalCell.className = 'p-1 text-center font-bold';
-      totalCell.id = `total${idx}`;
-      totalCell.textContent = '0';
-      row.appendChild(totalCell);
+      const averageCell = document.createElement('td');
+      averageCell.className = 'p-1 text-center font-bold';
+      averageCell.id = `average${idx}`;
+      averageCell.textContent = '0.0';
+      row.appendChild(averageCell);
 
       return row;
     }
 
-    function calculateTotal(playerIndex) {
+    function calculateAverage(playerIndex) {
       let total = 0;
+      let count = 0;
       for (let day = 1; day <= 4; day++) {
         const input = document.querySelector(`.day${day}.player${playerIndex}`);
         const value = parseInt(input.value);
-        if (!isNaN(value)) total += value;
+        if (!isNaN(value)) {
+          total += value;
+          count++;
+        }
       }
-      document.getElementById(`total${playerIndex}`).textContent = total;
+      const avg = count > 0 ? (total / count).toFixed(1) : '0.0';
+      document.getElementById(`average${playerIndex}`).textContent = avg;
     }
 
     // 초기화
