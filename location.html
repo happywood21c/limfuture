@@ -7,35 +7,41 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-green-50 min-h-screen p-4">
-  <div class="max-w-md mx-auto bg-white shadow-lg rounded-xl p-4">
+  <div class="max-w-full mx-auto bg-white shadow-lg rounded-xl p-4">
     <h1 class="text-xl font-bold text-center mb-4">⛳ 골프 스코어보드</h1>
-    <table class="table-auto w-full text-sm mb-6">
-      <thead>
-        <tr class="bg-green-200 text-gray-800">
-          <th class="p-1">이름</th>
-          <th class="p-1">Day 1</th>
-          <th class="p-1">Day 2</th>
-          <th class="p-1">Day 3</th>
-          <th class="p-1">Day 4</th>
-          <th class="p-1">평균</th>
-        </tr>
-      </thead>
-      <tbody id="scoreTable"></tbody>
-    </table>
 
-    <!-- 핸디 입력과 비교 -->
+    <!-- 스코어 테이블 -->
+    <div class="overflow-x-auto">
+      <table class="table-auto w-full text-sm mb-6 min-w-[600px]">
+        <thead>
+          <tr class="bg-green-200 text-gray-800">
+            <th class="p-1">이름</th>
+            <th class="p-1">Day 1</th>
+            <th class="p-1">Day 2</th>
+            <th class="p-1">Day 3</th>
+            <th class="p-1">Day 4</th>
+            <th class="p-1">평균</th>
+          </tr>
+        </thead>
+        <tbody id="scoreTable"></tbody>
+      </table>
+    </div>
+
+    <!-- 핸디 테이블 -->
     <h2 class="text-lg font-semibold mb-2 text-center">🏌️ 핸디캡 비교</h2>
-    <table class="table-auto w-full text-sm">
-      <thead>
-        <tr class="bg-blue-200 text-gray-800">
-          <th class="p-1">이름</th>
-          <th class="p-1">핸디</th>
-          <th class="p-1">4일 총합</th>
-          <th class="p-1">차이</th>
-        </tr>
-      </thead>
-      <tbody id="handicapTable"></tbody>
-    </table>
+    <div class="overflow-x-auto">
+      <table class="table-auto w-full text-sm min-w-[500px]">
+        <thead>
+          <tr class="bg-blue-200 text-gray-800">
+            <th class="p-1">이름</th>
+            <th class="p-1">핸디</th>
+            <th class="p-1">4일 총합</th>
+            <th class="p-1">차이</th>
+          </tr>
+        </thead>
+        <tbody id="handicapTable"></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
@@ -89,57 +95,4 @@
       handicapInput.min = 0;
       handicapInput.className = `handicap-input p-1 text-center w-full border rounded-md player${idx}`;
       handicapInput.oninput = () => updateHandicapDiff(idx);
-      handicapCell.appendChild(handicapInput);
-      row.appendChild(handicapCell);
-
-      const totalCell = document.createElement('td');
-      totalCell.id = `total${idx}`;
-      totalCell.className = 'p-1 text-center';
-      totalCell.textContent = '0';
-      row.appendChild(totalCell);
-
-      const diffCell = document.createElement('td');
-      diffCell.id = `diff${idx}`;
-      diffCell.className = 'p-1 text-center font-bold';
-      diffCell.textContent = '0';
-      row.appendChild(diffCell);
-
-      return row;
-    }
-
-    function calculateAverage(idx) {
-      let total = 0;
-      let count = 0;
-      for (let day = 1; day <= 4; day++) {
-        const input = document.querySelector(`.day${day}.player${idx}`);
-        const value = parseInt(input.value);
-        if (!isNaN(value)) {
-          total += value;
-          count++;
-        }
-      }
-      const avg = count > 0 ? (total / count).toFixed(1) : '0.0';
-      document.getElementById(`average${idx}`).textContent = avg;
-    }
-
-    function updateHandicapDiff(idx) {
-      let total = 0;
-      for (let day = 1; day <= 4; day++) {
-        const input = document.querySelector(`.day${day}.player${idx}`);
-        const value = parseInt(input.value);
-        if (!isNaN(value)) {
-          total += value;
-        }
-      }
-
-      document.getElementById(`total${idx}`).textContent = total;
-
-      const handicapInput = document.querySelector(`.handicap-input.player${idx}`);
-      const handicap = parseInt(handicapInput.value);
-      const diff = !isNaN(handicap) ? (total - handicap) : 0;
-
-      document.getElementById(`diff${idx}`).textContent = diff;
-    }
-
-    // 초기화
-    const scoreTable = document.get
+      handicapCell
