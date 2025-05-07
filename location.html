@@ -6,21 +6,21 @@
   <title>골프 스코어보드</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-green-50 min-h-screen p-4">
-  <div class="max-w-full mx-auto bg-white shadow-lg rounded-xl p-4">
-    <h1 class="text-xl font-bold text-center mb-4">⛳ 골프 스코어보드</h1>
+<body class="bg-green-50 min-h-screen p-2">
+  <div class="max-w-full mx-auto bg-white shadow-md rounded-lg p-3">
+    <h1 class="text-lg font-bold text-center mb-3">⛳ 골프 스코어보드</h1>
 
     <!-- 스코어 테이블 -->
-    <div class="overflow-x-auto mb-6">
-      <table class="table w-full text-sm min-w-[700px] border">
-        <thead class="bg-green-200">
+    <div class="overflow-x-auto mb-4">
+      <table class="table-auto w-full text-xs border">
+        <thead class="bg-green-200 text-gray-700">
           <tr>
-            <th class="p-2">이름</th>
-            <th class="p-2">Day 1</th>
-            <th class="p-2">Day 2</th>
-            <th class="p-2">Day 3</th>
-            <th class="p-2">Day 4</th>
-            <th class="p-2">평균</th>
+            <th class="p-1">이름</th>
+            <th class="p-1">D1</th>
+            <th class="p-1">D2</th>
+            <th class="p-1">D3</th>
+            <th class="p-1">D4</th>
+            <th class="p-1">평균</th>
           </tr>
         </thead>
         <tbody id="scoreTable"></tbody>
@@ -28,15 +28,15 @@
     </div>
 
     <!-- 핸디 테이블 -->
-    <h2 class="text-lg font-semibold mb-2 text-center">🏌️ 핸디캡 비교</h2>
+    <h2 class="text-sm font-semibold text-center mb-2">🏌️ 핸디캡 비교 (핸디 - 평균)</h2>
     <div class="overflow-x-auto">
-      <table class="table w-full text-sm min-w-[600px] border">
-        <thead class="bg-blue-200">
+      <table class="table-auto w-full text-xs border">
+        <thead class="bg-blue-200 text-gray-700">
           <tr>
-            <th class="p-2">이름</th>
-            <th class="p-2">핸디</th>
-            <th class="p-2">4일 총합</th>
-            <th class="p-2">차이</th>
+            <th class="p-1">이름</th>
+            <th class="p-1">핸디</th>
+            <th class="p-1">평균 점수</th>
+            <th class="p-1">차이</th>
           </tr>
         </thead>
         <tbody id="handicapTable"></tbody>
@@ -51,21 +51,19 @@
     const handicapTable = document.getElementById('handicapTable');
 
     players.forEach((name, idx) => {
-      // Score Row
+      // 스코어 행 생성
       const scoreRow = document.createElement('tr');
-      scoreRow.classList.add('border-b');
 
       const nameTd = document.createElement('td');
-      nameTd.className = 'p-2 text-center font-semibold';
+      nameTd.className = 'p-1 text-center font-medium';
       nameTd.textContent = name;
       scoreRow.appendChild(nameTd);
 
       for (let d = 1; d <= 4; d++) {
         const td = document.createElement('td');
-        td.className = 'p-1';
         const input = document.createElement('input');
         input.type = 'number';
-        input.className = `day${d} player${idx} w-full text-center border rounded px-1 py-1`;
+        input.className = `day${d} player${idx} w-full text-center border rounded px-1 py-0.5`;
         input.addEventListener('input', () => {
           updateAverage(idx);
           updateHandicapDiff(idx);
@@ -76,72 +74,61 @@
 
       const avgTd = document.createElement('td');
       avgTd.id = `average${idx}`;
-      avgTd.className = 'p-2 text-center font-bold';
+      avgTd.className = 'p-1 text-center font-bold';
       avgTd.textContent = '0.0';
       scoreRow.appendChild(avgTd);
 
       scoreTable.appendChild(scoreRow);
 
-      // Handicap Row
-      const handicapRow = document.createElement('tr');
-      handicapRow.classList.add('border-b');
+      // 핸디 행 생성
+      const hRow = document.createElement('tr');
 
-      const name2Td = document.createElement('td');
-      name2Td.className = 'p-2 text-center font-semibold';
-      name2Td.textContent = name;
-      handicapRow.appendChild(name2Td);
+      const hName = document.createElement('td');
+      hName.className = 'p-1 text-center font-medium';
+      hName.textContent = name;
+      hRow.appendChild(hName);
 
-      const handicapTd = document.createElement('td');
-      const handicapInput = document.createElement('input');
-      handicapInput.type = 'number';
-      handicapInput.className = `handicap player${idx} w-full text-center border rounded px-1 py-1`;
-      handicapInput.addEventListener('input', () => updateHandicapDiff(idx));
-      handicapTd.appendChild(handicapInput);
-      handicapRow.appendChild(handicapTd);
+      const hInputTd = document.createElement('td');
+      const hInput = document.createElement('input');
+      hInput.type = 'number';
+      hInput.className = `handicap player${idx} w-full text-center border rounded px-1 py-0.5`;
+      hInput.addEventListener('input', () => updateHandicapDiff(idx));
+      hInputTd.appendChild(hInput);
+      hRow.appendChild(hInputTd);
 
-      const totalTd = document.createElement('td');
-      totalTd.id = `total${idx}`;
-      totalTd.className = 'p-2 text-center';
-      totalTd.textContent = '0';
-      handicapRow.appendChild(totalTd);
+      const hAvg = document.createElement('td');
+      hAvg.id = `hAverage${idx}`;
+      hAvg.className = 'p-1 text-center';
+      hAvg.textContent = '0.0';
+      hRow.appendChild(hAvg);
 
-      const diffTd = document.createElement('td');
-      diffTd.id = `diff${idx}`;
-      diffTd.className = 'p-2 text-center font-bold';
-      diffTd.textContent = '0';
-      handicapRow.appendChild(diffTd);
+      const hDiff = document.createElement('td');
+      hDiff.id = `diff${idx}`;
+      hDiff.className = 'p-1 text-center font-bold';
+      hDiff.textContent = '0.0';
+      hRow.appendChild(hDiff);
 
-      handicapTable.appendChild(handicapRow);
+      handicapTable.appendChild(hRow);
     });
 
     function updateAverage(idx) {
-      let sum = 0;
-      let count = 0;
+      let sum = 0, count = 0;
       for (let d = 1; d <= 4; d++) {
-        const input = document.querySelector(`.day${d}.player${idx}`);
-        const val = parseInt(input.value);
+        const val = parseFloat(document.querySelector(`.day${d}.player${idx}`).value);
         if (!isNaN(val)) {
           sum += val;
           count++;
         }
       }
-      const avg = count ? (sum / count).toFixed(1) : '0.0';
+      const avg = count > 0 ? (sum / count).toFixed(1) : '0.0';
       document.getElementById(`average${idx}`).textContent = avg;
+      document.getElementById(`hAverage${idx}`).textContent = avg;
     }
 
     function updateHandicapDiff(idx) {
-      let sum = 0;
-      for (let d = 1; d <= 4; d++) {
-        const input = document.querySelector(`.day${d}.player${idx}`);
-        const val = parseInt(input.value);
-        if (!isNaN(val)) sum += val;
-      }
-      document.getElementById(`total${idx}`).textContent = sum;
-
-      const handicapInput = document.querySelector(`.handicap.player${idx}`);
-      const handicap = parseInt(handicapInput.value);
-      const diff = !isNaN(handicap) ? sum - handicap : 0;
-
+      const avg = parseFloat(document.getElementById(`average${idx}`).textContent);
+      const handicap = parseFloat(document.querySelector(`.handicap.player${idx}`).value);
+      const diff = (!isNaN(avg) && !isNaN(handicap)) ? (handicap - avg).toFixed(1) : '0.0';
       document.getElementById(`diff${idx}`).textContent = diff;
     }
   </script>
