@@ -11,16 +11,16 @@
     <h1 class="text-xl font-bold text-center mb-4">⛳ 골프 스코어보드</h1>
 
     <!-- 스코어 테이블 -->
-    <div class="overflow-x-auto">
-      <table class="table-auto w-full text-sm mb-6 min-w-[600px]">
-        <thead>
-          <tr class="bg-green-200 text-gray-800">
-            <th class="p-1">이름</th>
-            <th class="p-1">Day 1</th>
-            <th class="p-1">Day 2</th>
-            <th class="p-1">Day 3</th>
-            <th class="p-1">Day 4</th>
-            <th class="p-1">평균</th>
+    <div class="overflow-x-auto mb-6">
+      <table class="table w-full text-sm min-w-[700px] border">
+        <thead class="bg-green-200">
+          <tr>
+            <th class="p-2">이름</th>
+            <th class="p-2">Day 1</th>
+            <th class="p-2">Day 2</th>
+            <th class="p-2">Day 3</th>
+            <th class="p-2">Day 4</th>
+            <th class="p-2">평균</th>
           </tr>
         </thead>
         <tbody id="scoreTable"></tbody>
@@ -30,13 +30,13 @@
     <!-- 핸디 테이블 -->
     <h2 class="text-lg font-semibold mb-2 text-center">🏌️ 핸디캡 비교</h2>
     <div class="overflow-x-auto">
-      <table class="table-auto w-full text-sm min-w-[500px]">
-        <thead>
-          <tr class="bg-blue-200 text-gray-800">
-            <th class="p-1">이름</th>
-            <th class="p-1">핸디</th>
-            <th class="p-1">4일 총합</th>
-            <th class="p-1">차이</th>
+      <table class="table w-full text-sm min-w-[600px] border">
+        <thead class="bg-blue-200">
+          <tr>
+            <th class="p-2">이름</th>
+            <th class="p-2">핸디</th>
+            <th class="p-2">4일 총합</th>
+            <th class="p-2">차이</th>
           </tr>
         </thead>
         <tbody id="handicapTable"></tbody>
@@ -47,52 +47,103 @@
   <script>
     const players = ['홍길동', '김철수', '이영희', '박지민', '최유리', '정우성'];
 
-    function createScoreRow(name, idx) {
-      const row = document.createElement('tr');
-      row.classList.add('border-b');
+    const scoreTable = document.getElementById('scoreTable');
+    const handicapTable = document.getElementById('handicapTable');
 
-      const nameCell = document.createElement('td');
-      nameCell.className = 'p-1 text-center font-medium';
-      nameCell.textContent = name;
-      row.appendChild(nameCell);
+    players.forEach((name, idx) => {
+      // Score Row
+      const scoreRow = document.createElement('tr');
+      scoreRow.classList.add('border-b');
 
-      for (let day = 1; day <= 4; day++) {
-        const cell = document.createElement('td');
-        cell.className = 'p-1';
+      const nameTd = document.createElement('td');
+      nameTd.className = 'p-2 text-center font-semibold';
+      nameTd.textContent = name;
+      scoreRow.appendChild(nameTd);
+
+      for (let d = 1; d <= 4; d++) {
+        const td = document.createElement('td');
+        td.className = 'p-1';
         const input = document.createElement('input');
         input.type = 'number';
-        input.min = 0;
-        input.className = `score-input p-1 text-center w-full border rounded-md day${day} player${idx}`;
-        input.oninput = () => {
-          calculateAverage(idx);
+        input.className = `day${d} player${idx} w-full text-center border rounded px-1 py-1`;
+        input.addEventListener('input', () => {
+          updateAverage(idx);
           updateHandicapDiff(idx);
-        };
-        cell.appendChild(input);
-        row.appendChild(cell);
+        });
+        td.appendChild(input);
+        scoreRow.appendChild(td);
       }
 
-      const avgCell = document.createElement('td');
-      avgCell.className = 'p-1 text-center font-bold';
-      avgCell.id = `average${idx}`;
-      avgCell.textContent = '0.0';
-      row.appendChild(avgCell);
+      const avgTd = document.createElement('td');
+      avgTd.id = `average${idx}`;
+      avgTd.className = 'p-2 text-center font-bold';
+      avgTd.textContent = '0.0';
+      scoreRow.appendChild(avgTd);
 
-      return row;
-    }
+      scoreTable.appendChild(scoreRow);
 
-    function createHandicapRow(name, idx) {
-      const row = document.createElement('tr');
-      row.classList.add('border-b');
+      // Handicap Row
+      const handicapRow = document.createElement('tr');
+      handicapRow.classList.add('border-b');
 
-      const nameCell = document.createElement('td');
-      nameCell.className = 'p-1 text-center font-medium';
-      nameCell.textContent = name;
-      row.appendChild(nameCell);
+      const name2Td = document.createElement('td');
+      name2Td.className = 'p-2 text-center font-semibold';
+      name2Td.textContent = name;
+      handicapRow.appendChild(name2Td);
 
-      const handicapCell = document.createElement('td');
+      const handicapTd = document.createElement('td');
       const handicapInput = document.createElement('input');
       handicapInput.type = 'number';
-      handicapInput.min = 0;
-      handicapInput.className = `handicap-input p-1 text-center w-full border rounded-md player${idx}`;
-      handicapInput.oninput = () => updateHandicapDiff(idx);
-      handicapCell
+      handicapInput.className = `handicap player${idx} w-full text-center border rounded px-1 py-1`;
+      handicapInput.addEventListener('input', () => updateHandicapDiff(idx));
+      handicapTd.appendChild(handicapInput);
+      handicapRow.appendChild(handicapTd);
+
+      const totalTd = document.createElement('td');
+      totalTd.id = `total${idx}`;
+      totalTd.className = 'p-2 text-center';
+      totalTd.textContent = '0';
+      handicapRow.appendChild(totalTd);
+
+      const diffTd = document.createElement('td');
+      diffTd.id = `diff${idx}`;
+      diffTd.className = 'p-2 text-center font-bold';
+      diffTd.textContent = '0';
+      handicapRow.appendChild(diffTd);
+
+      handicapTable.appendChild(handicapRow);
+    });
+
+    function updateAverage(idx) {
+      let sum = 0;
+      let count = 0;
+      for (let d = 1; d <= 4; d++) {
+        const input = document.querySelector(`.day${d}.player${idx}`);
+        const val = parseInt(input.value);
+        if (!isNaN(val)) {
+          sum += val;
+          count++;
+        }
+      }
+      const avg = count ? (sum / count).toFixed(1) : '0.0';
+      document.getElementById(`average${idx}`).textContent = avg;
+    }
+
+    function updateHandicapDiff(idx) {
+      let sum = 0;
+      for (let d = 1; d <= 4; d++) {
+        const input = document.querySelector(`.day${d}.player${idx}`);
+        const val = parseInt(input.value);
+        if (!isNaN(val)) sum += val;
+      }
+      document.getElementById(`total${idx}`).textContent = sum;
+
+      const handicapInput = document.querySelector(`.handicap.player${idx}`);
+      const handicap = parseInt(handicapInput.value);
+      const diff = !isNaN(handicap) ? sum - handicap : 0;
+
+      document.getElementById(`diff${idx}`).textContent = diff;
+    }
+  </script>
+</body>
+</html>
