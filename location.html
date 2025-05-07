@@ -1,29 +1,79 @@
 <!DOCTYPE html>
-<html>
-<body>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>골프 스코어보드</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 min-h-screen p-4">
+  <div class="max-w-md mx-auto bg-white shadow-lg rounded-xl p-4">
+    <h1 class="text-xl font-bold text-center mb-4">⛳ 골프 스코어보드</h1>
+    <table class="table-auto w-full text-sm">
+      <thead>
+        <tr class="bg-green-200 text-gray-800">
+          <th class="p-1">이름</th>
+          <th class="p-1">Day 1</th>
+          <th class="p-1">Day 2</th>
+          <th class="p-1">Day 3</th>
+          <th class="p-1">Day 4</th>
+          <th class="p-1">합계</th>
+        </tr>
+      </thead>
+      <tbody id="scoreTable">
+        <!-- JavaScript로 생성 -->
+      </tbody>
+    </table>
+  </div>
 
-<p>Click the button to get your coordinates.</p>
+  <script>
+    const players = ['홍길동', '김철수', '이영희', '박지민', '최유리', '정우성'];
 
-<button onclick="getLocation()">Try It</button>
+    function createScoreRow(name, idx) {
+      const row = document.createElement('tr');
+      row.classList.add('border-b');
 
-<p id="demo"></p>
+      const nameCell = document.createElement('td');
+      nameCell.className = 'p-1 text-center font-medium';
+      nameCell.textContent = name;
+      row.appendChild(nameCell);
 
-<script>
-var x = document.getElementById("demo");
+      for (let day = 1; day <= 4; day++) {
+        const cell = document.createElement('td');
+        cell.className = 'p-1';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = 0;
+        input.className = `score-input p-1 text-center w-full border rounded-md day${day} player${idx}`;
+        input.oninput = () => calculateTotal(idx);
+        cell.appendChild(input);
+        row.appendChild(cell);
+      }
 
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  } else {
-    x.innerHTML = "Geolocation is not supported by this browser.";
-  }
-}
+      const totalCell = document.createElement('td');
+      totalCell.className = 'p-1 text-center font-bold';
+      totalCell.id = `total${idx}`;
+      totalCell.textContent = '0';
+      row.appendChild(totalCell);
 
-function showPosition(position) {
-  x.innerHTML = "Latitude: " + position.coords.latitude +
-  "<br>Longitude: " + position.coords.longitude;
-}
-</script>
+      return row;
+    }
 
+    function calculateTotal(playerIndex) {
+      let total = 0;
+      for (let day = 1; day <= 4; day++) {
+        const input = document.querySelector(`.day${day}.player${playerIndex}`);
+        const value = parseInt(input.value);
+        if (!isNaN(value)) total += value;
+      }
+      document.getElementById(`total${playerIndex}`).textContent = total;
+    }
+
+    // 초기화
+    const table = document.getElementById('scoreTable');
+    players.forEach((name, index) => {
+      table.appendChild(createScoreRow(name, index));
+    });
+  </script>
 </body>
 </html>
